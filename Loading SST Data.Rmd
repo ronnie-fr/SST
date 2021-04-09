@@ -1,0 +1,57 @@
+---
+title: "Loading SST Data"
+author: "Ronnie Francois"
+date: "09/04/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+#clears workspace
+rm(list = ls())
+
+#Change the working directory accordingly.
+setwd(dir = "C:/Users/Ronnie/Desktop/SST Anomaly")
+
+#Install the following packages before loading them onto R.
+
+#install.packages(tidync)
+#install.packages(dplyr)
+
+#library(tidync)
+#library(dplyr)
+
+#Download the data from the servers of NOAA and save it to your working directory:
+#ftp://ftp.star.nesdis.noaa.gov/pub/sod/mecb/crw/data/5km/v3.1_op/nc/v1.0/daily/sst/
+#The NOAA Coral Reef Watch (CRW) daily global 5km (0.05 degree exactly) satellite
+#coral bleaching heat stress monitoring product suite presented here is Version 3.1
+#(v3.1). It spans January 1, 1985 to present and is based on CRW's v3.1 daily global
+#5km satellite sea surface temperature (SST) data product known as CoralTemp. 
+
+#Create a vector for the extraction of SST Data, specify your latitude and longitude
+#for your area of interest.
+sst_aga_2020 <- tidync("C:/Users/Ronnie/Desktop/SST Anomaly/DailyMeanSST/sst.day.mean.2020.nc")              %>%
+  hyper_filter(lon = lon == 56.625,
+               lat = lat == -10.375) %>% 
+  hyper_tibble() %>% 
+  select(lon, lat, time, sst) %>% 
+  dplyr::rename(t = time, temp = sst) %>% 
+  mutate(t = as.Date(t, origin = "1800-01-01"))
+
+sst_aga_2021 <- tidync("C:/Users/Ronnie/Desktop/SST Anomaly/DailyMeanSST/sst.day.mean.2021.nc")              %>%
+  hyper_filter(lon = lon == 56.625,
+               lat = lat == -10.375) %>% 
+  hyper_tibble() %>% 
+  select(lon, lat, time, sst) %>% 
+  dplyr::rename(t = time, temp = sst) %>% 
+  mutate(t = as.Date(t, origin = "1800-01-01"))
+
+#Save the vectors into csv files
+write.csv(sst_aga_2020, "sst_aga_2020.csv")
+write.csv(sst_aga_2021, "sst_aga_2021.csv")
+
+```
+
